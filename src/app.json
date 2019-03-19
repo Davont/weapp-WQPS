@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "pages/form2/main",
+    "pages/form1/main",
+    "pages/index/main",
+
+
+    "pages/select/main"
+
+
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "rgb(87,158,218)",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle": "white"
+  }
+}

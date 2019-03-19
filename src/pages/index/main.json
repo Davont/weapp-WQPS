@@ -1,0 +1,16 @@
+{
+  "navigationBarTitleText": "水 质 预 测 系 统",
+  "navigationBarBackgroundColor": "#1196db",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "wux-wing-blank": "../../static/wux/wing-blank/index",
+    "wux-white-space": "../../static/wux/white-space/index",
+    "wux-cell-group": "../../static/wux/cell-group/index",
+    "wux-cell": "../../static/wux/cell/index",
+    "wux-input": "../../static/wux/input/index",
+    "wux-icon": "../../static/wux/icon/index",
+    "wux-button": "../../static/wux/button/index",
+    "wux-notification": "../../static/wux/notification/index"
+
+  }
+}

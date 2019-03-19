@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "模型更新",
+  "navigationBarBackgroundColor": "#1196db",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "wux-divider": "../../static/wux/divider/index"
+  }
+}

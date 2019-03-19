@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "下月水质预测",
+  "navigationBarBackgroundColor": "#1196db",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "wux-divider": "../../static/wux/divider/index"
+  }
+}

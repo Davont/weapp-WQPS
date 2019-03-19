@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "预测选择",
+  "navigationBarBackgroundColor": "#1196db",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "wux-icon": "../../static/wux/icon/index",
+    "wux-button": "../../static/wux/button/index",
+    "wux-card": "../../static/wux/card/index",
+    "wux-wing-blank": "../../static/wux/wing-blank/index"
+  }
+}
