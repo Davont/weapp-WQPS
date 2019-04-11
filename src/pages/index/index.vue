@@ -3,7 +3,7 @@
     <wux-notification id="wux-notification"/>
     <wux-wing-blank size="small">
       <div class="wux-text--center top">
-        <p class="title">水质预测系统</p>
+        <p class="title">基于机器学习的水质预测微信小程序</p>
         <p class="intro">用机器学习算法使水质预测更加准确</p>
       </div>
       <div class="login">
@@ -30,7 +30,7 @@
             ></wux-input>
           </wux-cell>
         </wux-cell-group>
-        <wux-button block type="positive" @click="LearnCloudlogin">登陆</wux-button>
+        <wux-button id="button" block :loading="load" type="positive" @click="LearnCloudlogin">登陆</wux-button>
       </div>
     </wux-wing-blank>
     <div class="copyright">
@@ -47,23 +47,26 @@ export default {
   data() {
     return {
       username: "",
-      password: ""
+      password: "",
+      load: false
     };
   },
 
   methods: {
     handleUser(event) {
       this.username = event.mp.detail.value;
-      console.log(event.mp.detail);
+      //console.log(event.mp.detail);
     },
     handlePass(event) {
       this.password = event.mp.detail.value;
-      console.log(event.mp.detail);
+      //console.log(event.mp.detail);
     },
-    LearnCloudlogin() {
+    LearnCloudlogin(e) {
+      this.load = true;
+      var self = this;
       AV.User.logIn(this.username, this.password).then(
         function(loggedInUser) {
-          console.log(loggedInUser);
+          //console.log(loggedInUser);
           console.log("tag", "成功");
           const hide = $wuxNotification().show({
             image: "https://wux.cdn.cloverstd.com/logo.png",
@@ -74,11 +77,13 @@ export default {
               hide();
             }
           });
+          self.load = false;
           let url = "../select/main";
           wx.navigateTo({ url });
         },
         function(error) {
           console.log("tag", "失败");
+          self.load = false;
           const hide = $wuxNotification().show({
             image: "https://wux.cdn.cloverstd.com/logo.png",
             title: "登录失败！用户名或密码错误",

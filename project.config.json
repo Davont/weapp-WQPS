@@ -1,7 +1,7 @@
 {
 	"description": "项目配置文件。",
 	"setting": {
-		"urlCheck": false,
+		"urlCheck": true,
 		"es6": true,
 		"postcss": true,
 		"minified": true,
@@ -13,7 +13,7 @@
 	"compileType": "miniprogram",
 	"appid": "wxe6094adc143084f3",
 	"projectname": "water-check",
-	"libVersion": "2.6.1",
+	"libVersion": "2.6.2",
 	"condition": {
 		"search": {
 			"current": -1,

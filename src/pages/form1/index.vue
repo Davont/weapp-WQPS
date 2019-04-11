@@ -8,7 +8,7 @@
       <li>
         <wux-divider text="溶解氧"/>
         <div>
-          <p class="wux-text--center sub-title">溶 解 氧 {{nextMonthList.d_oxy}} mg / L</p>
+          <p class="wux-text--center sub-title">溶 解 氧 {{nextMonthList_DO}} mg / L</p>
         </div>
         <div class="echarts-height">
           <mpvue-echarts :echarts="echarts" :onInit="ecBarInit" canvasId="chart1"/>
@@ -19,7 +19,7 @@
         <div>
           <p class="wux-text--center sub-title">
             氨 氮
-            {{nextMonthList.a_nit}} mg / L
+            {{nextMonthList_NH3N}} mg / L
           </p>
         </div>
         <div class="echarts-height">
@@ -31,7 +31,7 @@
         <div>
           <p class="wux-text--center sub-title">
             PH
-            {{nextMonthList.ph}}
+            {{nextMonthList_PH}}
           </p>
         </div>
         <div class="echarts-height">
@@ -43,377 +43,141 @@
 </template>
 
 <script>
-import * as echarts from "echarts";
+import echarts from "echarts";
 import mpvueEcharts from "mpvue-echarts";
 var Fly = require("flyio/dist/npm/wx");
 var fly = new Fly();
 
 let barChart, scatterChart, chart3;
-function getBarOption() {
-  let getData = fly
-    .get("http://47.98.33.249:3000/nextMonth/get_dOxy")
-    .then(function(response) {
-      let data = [];
-      console.log(response.data.result);
-      for (let i of response.data.result) {
-        //console.log(i);
-        data.push([i.month, i.value]);
-      }
-      //console.log(data);
-      return {
-        title: {
-          text: "溶解氧"
-        },
-        tooltip: {
-          trigger: "axis"
-        },
-        xAxis: {
-          data: data.map(function(item) {
-            return item[0];
-          })
-        },
-        yAxis: {
-          splitLine: {
-            show: false
-          }
-        },
-        toolbox: {
-          left: "center",
-          feature: {
-            dataZoom: {
-              yAxisIndex: "none"
-            },
-            restore: {},
-            saveAsImage: {}
-          }
-        },
-        dataZoom: [
-          {
-            startValue: "2014-06-01"
-          },
-          {
-            type: "inside"
-          }
-        ],
-        visualMap: {
-          top: 10,
-          right: 10,
-          pieces: [
-            {
-              gt: 0,
-              lte: 50,
-              color: "#096"
-            },
-            {
-              gt: 50,
-              lte: 100,
-              color: "#ffde33"
-            },
-            {
-              gt: 100,
-              lte: 150,
-              color: "#ff9933"
-            },
-            {
-              gt: 150,
-              lte: 200,
-              color: "#cc0033"
-            },
-            {
-              gt: 200,
-              lte: 300,
-              color: "#660099"
-            },
-            {
-              gt: 300,
-              color: "#7e0023"
-            }
-          ],
-          outOfRange: {
-            color: "#999"
-          }
-        },
-        series: {
-          name: "溶解氧",
-          type: "line",
-          data: data.map(function(item) {
-            return item[1];
-          }),
-          markLine: {
-            silent: true,
-            data: [
-              {
-                yAxis: 50
-              },
-              {
-                yAxis: 100
-              },
-              {
-                yAxis: 150
-              },
-              {
-                yAxis: 200
-              },
-              {
-                yAxis: 300
-              }
-            ]
-          }
-        }
-      };
-    })
-    .catch(function(error) {
-      console.log(error);
-    });
-  //通过用户id获取信息,参数直接写在url中
+function getNextData(ob) {
+  return fly.get("https://www.hanyuspace.cn/predicter/predict/?obj=" + ob);
+}
 
-  console.log("\n\n------ begin: map ------");
-  console.log(getData);
-  console.log("------ end: map ------\n\n");
-  return getData;
+function getAllData(ob) {
+  return fly.get("https://www.hanyuspace.cn/predicter/waterquality/?obj=" + ob);
 }
-function getScatterOption() {
-  //通过用户id获取信息,参数直接写在url中
+function getBarOption(selectName, name) {
   let getData = fly
-    .get("http://47.98.33.249:3000/nextMonth/get_aNit")
-    .then(function(response) {
-      let data = [];
-      console.log(response.data.result);
-      for (let i of response.data.result) {
-        //console.log(i);
-        data.push([i.month, i.value]);
-      }
-      //console.log(data);
-      return {
-        title: {
-          text: "氨氮"
-        },
-        tooltip: {
-          trigger: "axis"
-        },
-        xAxis: {
-          data: data.map(function(item) {
-            return item[0];
-          })
-        },
-        yAxis: {
-          splitLine: {
-            show: false
-          }
-        },
-        toolbox: {
-          left: "center",
-          feature: {
-            dataZoom: {
-              yAxisIndex: "none"
-            },
-            restore: {},
-            saveAsImage: {}
-          }
-        },
-        dataZoom: [
-          {
-            startValue: "2014-06-01"
+    .all([getNextData(selectName), getAllData(selectName)])
+    .then(
+      fly.spread(function(nextData, alldata) {
+        let nextValue = nextData.data.data;
+        let data = [];
+        let list = alldata.data.data;
+        for (let i = list.month.length - 1; i >= 0; i--) {
+          //console.log(i);
+          //console.log(list.month);
+          data.push([list.month[i], list.data[i]]);
+        }
+        data.push([nextValue.next_month_num, nextValue.pred]);
+        //console.log(data);
+        return {
+          title: {
+            text: name
           },
-          {
-            type: "inside"
-          }
-        ],
-        visualMap: {
-          top: 10,
-          right: 10,
-          pieces: [
+          tooltip: {
+            trigger: "axis"
+          },
+          xAxis: {
+            data: data.map(function(item) {
+              return item[0];
+            })
+          },
+          yAxis: {
+            splitLine: {
+              show: false
+            }
+          },
+          toolbox: {
+            left: "center",
+            feature: {
+              dataZoom: {
+                yAxisIndex: "none"
+              },
+              restore: {},
+              saveAsImage: {}
+            }
+          },
+          dataZoom: [
             {
-              gt: 0,
-              lte: 50,
-              color: "#096"
+              startValue: "2014-06-01"
             },
             {
-              gt: 50,
-              lte: 100,
-              color: "#ffde33"
-            },
-            {
-              gt: 100,
-              lte: 150,
-              color: "#ff9933"
-            },
-            {
-              gt: 150,
-              lte: 200,
-              color: "#cc0033"
-            },
-            {
-              gt: 200,
-              lte: 300,
-              color: "#660099"
-            },
-            {
-              gt: 300,
-              color: "#7e0023"
+              type: "inside"
             }
           ],
-          outOfRange: {
-            color: "#999"
-          }
-        },
-        series: {
-          name: "氨氮",
-          type: "line",
-          data: data.map(function(item) {
-            return item[1];
-          }),
-          markLine: {
-            silent: true,
-            data: [
+          visualMap: {
+            top: 2,
+            right: 2,
+            pieces: [
               {
-                yAxis: 50
+                gt: 0,
+                lte: 2,
+                color: "#096"
               },
               {
-                yAxis: 100
+                gt: 2,
+                lte: 4,
+                color: "#ffde33"
               },
               {
-                yAxis: 150
+                gt: 4,
+                lte: 6,
+                color: "#ff9933"
               },
               {
-                yAxis: 200
+                gt: 6,
+                lte: 8,
+                color: "#cc0033"
               },
               {
-                yAxis: 300
+                gt: 8,
+                lte: 10,
+                color: "#660099"
+              },
+              {
+                gt: 10,
+                color: "#7e0023"
               }
-            ]
-          }
-        }
-      };
-    })
-    .catch(function(error) {
-      console.log(error);
-    });
-  console.log("\n\n------ begin: map ------");
-  console.log(getData);
-  console.log("------ end: map ------\n\n");
-  return getData;
-}
-function getChart3Option() {
-  //通过用户id获取信息,参数直接写在url中
-  let getData = fly
-    .get("http://47.98.33.249:3000/nextMonth/get_ph")
-    .then(function(response) {
-      let data = [];
-      console.log(response.data.result);
-      for (let i of response.data.result) {
-        //console.log(i);
-        data.push([i.month, i.value]);
-      }
-      //console.log(data);
-      return {
-        title: {
-          text: "PH"
-        },
-        tooltip: {
-          trigger: "axis"
-        },
-        xAxis: {
-          data: data.map(function(item) {
-            return item[0];
-          })
-        },
-        yAxis: {
-          splitLine: {
-            show: false
-          }
-        },
-        toolbox: {
-          left: "center",
-          feature: {
-            dataZoom: {
-              yAxisIndex: "none"
-            },
-            restore: {},
-            saveAsImage: {}
-          }
-        },
-        dataZoom: [
-          {
-            startValue: "2014-06-01"
-          },
-          {
-            type: "inside"
-          }
-        ],
-        visualMap: {
-          top: 10,
-          right: 10,
-          pieces: [
-            {
-              gt: 0,
-              lte: 50,
-              color: "#096"
-            },
-            {
-              gt: 50,
-              lte: 100,
-              color: "#ffde33"
-            },
-            {
-              gt: 100,
-              lte: 150,
-              color: "#ff9933"
-            },
-            {
-              gt: 150,
-              lte: 200,
-              color: "#cc0033"
-            },
-            {
-              gt: 200,
-              lte: 300,
-              color: "#660099"
-            },
-            {
-              gt: 300,
-              color: "#7e0023"
+            ],
+            outOfRange: {
+              color: "#999"
             }
-          ],
-          outOfRange: {
-            color: "#999"
+          },
+          series: {
+            name: "2222",
+            type: "line",
+            data: data.map(function(item) {
+              return item[1];
+            }),
+            markLine: {
+              silent: true,
+              data: [
+                {
+                  yAxis: 2
+                },
+                {
+                  yAxis: 4
+                },
+                {
+                  yAxis: 6
+                },
+                {
+                  yAxis: 8
+                },
+                {
+                  yAxis: 10
+                }
+              ]
+            }
           }
-        },
-        series: {
-          name: "PH",
-          type: "line",
-          data: data.map(function(item) {
-            return item[1];
-          }),
-          markLine: {
-            silent: true,
-            data: [
-              {
-                yAxis: 50
-              },
-              {
-                yAxis: 100
-              },
-              {
-                yAxis: 150
-              },
-              {
-                yAxis: 200
-              },
-              {
-                yAxis: 300
-              }
-            ]
-          }
-        }
-      };
-    })
-    .catch(function(error) {
-      console.log(error);
+        };
+      })
+    )
+    .catch(function(err) {
+      console.log(err);
     });
-  console.log("\n\n------ begin: map ------");
-  console.log(getData);
-  console.log("------ end: map ------\n\n");
+
   return getData;
 }
 export default {
@@ -426,7 +190,7 @@ export default {
           height: height
         });
         canvas.setChart(barChart);
-        getBarOption().then(function(data) {
+        getBarOption("DO", "溶解氧").then(function(data) {
           barChart.setOption(data);
         });
         return barChart;
@@ -437,7 +201,8 @@ export default {
           height: height
         });
         canvas.setChart(scatterChart);
-        getScatterOption().then(function(data) {
+        getBarOption("NH3N", "氨氮").then(function(data) {
+          //console.log(data);
           scatterChart.setOption(data);
         });
         return scatterChart;
@@ -448,12 +213,14 @@ export default {
           height: height
         });
         canvas.setChart(chart3);
-        getChart3Option().then(function(data) {
+        getBarOption("PH", "PH").then(function(data) {
           chart3.setOption(data);
         });
         return chart3;
       },
-      nextMonthList: {}
+      nextMonthList_DO: "",
+      nextMonthList_NH3N: "",
+      nextMonthList_PH: ""
     };
   },
   components: {
@@ -462,11 +229,28 @@ export default {
   beforeCreate() {
     var self = this;
     fly
-      .get("http://47.98.33.249:3000/nextMonth/get_nextMonth_list")
+      .get("https://www.hanyuspace.cn/predicter/predict/?obj=DO")
       .then(function(res) {
-        self.nextMonthList = res.data.result[0];
-        //console.log(self.nextMonthList);
-        //console.log(res.data.result);
+        //console.log(res);
+        self.nextMonthList_DO = res.data.data.pred;
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
+    fly
+      .get("https://www.hanyuspace.cn/predicter/predict/?obj=NH3N")
+      .then(function(res) {
+        //console.log(res);
+        self.nextMonthList_NH3N = res.data.data.pred;
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
+    fly
+      .get("https://www.hanyuspace.cn/predicter/predict/?obj=PH")
+      .then(function(res) {
+        //console.log(res);
+        self.nextMonthList_PH = res.data.data.pred;
       })
       .catch(function(err) {
         console.log(err);

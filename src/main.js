@@ -14,11 +14,8 @@ AV.init({
 export default {
   config: {
     pages: [
-      'pages/form1/main',
       'pages/index/main',
-
-
-
+      'pages/form1/main',
       "pages/select/main",
       'pages/form2/main',
     ],

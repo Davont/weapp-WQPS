@@ -1,13 +1,9 @@
 {
   "pages": [
-    "pages/form2/main",
-    "pages/form1/main",
     "pages/index/main",
-
-
+    "pages/form1/main",
+    "pages/form2/main",
     "pages/select/main"
-
-
   ],
   "window": {
     "backgroundTextStyle": "light",

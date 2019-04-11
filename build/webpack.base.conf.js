@@ -60,6 +60,7 @@ let baseWebpackConfig = {
         loader: 'mpvue-loader',
         options: vueLoaderConfig
       },
+
       {
         test: /\.js$/,
         include: [resolve('src'), resolve('test')],
